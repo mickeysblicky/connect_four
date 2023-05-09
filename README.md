@@ -1,1 +1,1 @@
-# connect_four
+This is a tdd developed connect four program
