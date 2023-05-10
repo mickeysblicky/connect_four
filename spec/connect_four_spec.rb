@@ -3,34 +3,14 @@ require_relative '../lib/connect_four_game.rb'
 describe Connect_four do 
 
     describe '#start_game' do
-        
-        context 'when new game is started' do 
-            subject(:new_game) {described_class.new('mickey', 'pendejo')}
-            before do
-                allow(new_game).to receive(:show_board)
-                allow(new_game).to receive(:over?).and_return(true)
-                allow(new_game).to receive(:round)
-           end
-
-            xit 'creates a board' do 
-                expect{new_game.start_game}.to change{new_game.instance_variable_get(:@rows)}.from([]).to([
-                    row6 = "|___|___|___|___|___|___|___|",
-                    row5 = "|___|___|___|___|___|___|___|",
-                    row4 = "|___|___|___|___|___|___|___|",
-                    row3 = "|___|___|___|___|___|___|___|",
-                    row2 = "|___|___|___|___|___|___|___|",
-                    row1 = "|___|___|___|___|___|___|___|"
-                ])
-            end
-        end
 
         context 'when over?() calls round twice'do
-            subject(:new_game) {described_class.new('michael', 'pendeja')}
+            subject(:new_game) {described_class.new('michael', 'chango')}
             
             before do 
-                allow(new_game).to receive(:make_board)
                 allow(new_game).to receive(:show_board)
                 allow(new_game).to receive(:over?).and_return(false, false, true)
+                allow(new_game).to receive(:replay)
             end
 
             it 'calls round() twice' do
@@ -40,12 +20,12 @@ describe Connect_four do
         end
 
         context 'when over?() calls round() three times' do
-            subject(:new_game) {described_class.new('mickey', 'caca')}
+            subject(:new_game) {described_class.new('mickey', 'chhango')}
 
             before do 
-                allow(new_game).to receive(:make_board)
                 allow(new_game).to receive(:show_board)
                 allow(new_game).to receive(:over?).and_return(false, false, false, true)
+                allow(new_game).to receive(:replay)
             end
 
             it 'calls round() three times' do
@@ -58,9 +38,9 @@ describe Connect_four do
             subject(:new_game) {described_class.new('mf', 'fm')}
 
             before do
-                allow(new_game).to receive(:make_board)
                 allow(new_game).to receive(:show_board)
                 allow(new_game).to receive(:over?).and_return(false, false, false, false, true)
+                allow(new_game).to receive(:replay)
             end
 
             it 'calls round() 4 times' do 
@@ -106,11 +86,12 @@ describe Connect_four do
                 valid_input = '7'
                 allow(new_game).to receive(:gets).and_return(unvalid_input, valid_input)
                 allow(new_game).to receive(:move_to_board)
+                allow(new_game).to receive(:show_board)
                 allow(new_game).to receive(:win?)
             end
 
             it 'outputs error message once' do 
-                error_message = "Error. Move must be 1, 2, 3, 4, 5, 6, or 7."
+                error_message = "\nError. Move must be 1, 2, 3, 4, 5, 6, or 7."
                 expect(new_game).to receive(:puts).with(error_message).once
                 new_game.make_move('s')
             end
@@ -183,7 +164,7 @@ describe Connect_four do
             end 
 
             it 'outputs error message' do
-                error_message = "Error. Column is filled choose another place."
+                error_message = "\nError. Column is filled choose another place."
                 expect(new_game).to receive(:puts).with(error_message)
                 new_game.move_to_board('1', 'a', -1)
             end
@@ -220,7 +201,7 @@ describe Connect_four do
     describe '#win?' do 
 
         context 'when there is a vertical line of the same letter' do
-            subject(:new_game) {described_class.new('mickey', 'nalgas', 'X', 'O')}
+            subject(:new_game) {described_class.new('mickey', 'chango', 'X', 'O')}
 
             before do 
                 rows = new_game.instance_variable_get(:@rows)
@@ -228,23 +209,17 @@ describe Connect_four do
                 rows[4][2] = 'X'
                 rows[3][2] = 'X'
                 rows[2][2] = 'X'
-                allow(new_game).to receive(:valid_difference?).and_return(true)
-                allow(new_game).to receive(:vertical_line_column?).and_return(true)
             end
 
-            it 'outputs winning message' do 
+            it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                message = "vertical line detected: [2, 3, 4, 5]"
-                message2 = "mickey. You won!"
-                expect(new_game).to receive(:puts).with(message)
-                expect(new_game).to receive(:puts).with(message2)
-                new_game.win?('mickey')
+                expect(new_game.win?('mickey')).to eq(true)
             end
         end
 
         context 'when there is a horizontal line of the same letter' do 
-            subject(:new_game) {described_class.new('mickey', 'nalgitas', 'X', 'O')}
+            subject(:new_game) {described_class.new('mickey', 'chango', 'X', 'O')}
 
             before do 
                 rows = new_game.instance_variable_get(:@rows)
@@ -252,26 +227,17 @@ describe Connect_four do
                 rows[5][6] = 'X'
                 rows[5][10] = 'X'
                 rows[5][14] = 'X'
-                allow(new_game).to receive(:vertical_line_column?).and_return(false)
-                allow(new_game).to receive(:valid_difference?).and_return(false)
-                allow(new_game).to receive(:vertical_line_column?).and_return(false)
-                allow(new_game).to receive(:valid_difference?).and_return(true)
-                allow(new_game).to receive(:horizontal_line_row?).and_return(true)
             end
 
-            it 'outputs winning message' do 
+            it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                message = "horizontal line detected: [0, 1, 2, 3]"
-                message2 = "mickey. You won!"
-                expect(new_game).to receive(:puts).with(message)
-                expect(new_game).to receive(:puts).with(message2)
-                new_game.win?('mickey')
+                expect(new_game.win?('mickey')).to eq(true)
             end
         end
 
         context 'when there is a diagonal line of the same letter' do 
-            subject(:new_game) {described_class.new('mickey', 'nalgas', 'X', 'O')}
+            subject(:new_game) {described_class.new('mickey', 'chango', 'X', 'O')}
 
             before do 
                 rows = new_game.instance_variable_get(:@rows)
@@ -279,79 +245,12 @@ describe Connect_four do
                 rows[4][6] = 'X'
                 rows[3][10] = 'X'
                 rows[2][14] = 'X'
-                allow(new_game).to receive(:vertical_line_column?).and_return(false)
-                allow(new_game).to receive(:valid_difference?).and_return(false)
-                allow(new_game).to receive(:vertical_line_column?).and_return(false)
-                allow(new_game).to receive(:valid_difference?).and_return(false)
-                allow(new_game).to receive(:horizontal_line_row?).and_return(false)
-                allow(new_game).to receive(:diagonal_line?).and_return(true)
             end
 
-            it 'outputs winning message' do 
+            it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                message = "diagonal line detected: row: [2, 3, 4, 5] column: [3, 2, 1, 0]"
-                message2 = 'mickey. You won!'
-                expect(new_game).to receive(:puts).with(message)
-                expect(new_game).to receive(:puts).with(message2)
-                new_game.win?('mickey')
-            end
-        end
-    end
-
-    describe '#valid_difference?' do
-
-        context "when given array of row nums that contain a token and have 4 numbers that all have a difference of 1" do 
-            subject(:new_game) {described_class.new('mickey', 'cheeks', 'X', 'O')}
-
-            it 'returns true' do 
-                array = [2, 3, 4, 5]
-                expect(new_game.valid_difference?(array)).to eq(true)
-            end
-        end
-
-        context "when given array of row nums that contain a token and have 4 numbers that have difference of 1" do 
-            subject(:new_game) {described_class.new('mickey', 'chango', 'X', 'O')}
-
-            it 'changes @valid_line' do 
-                array = [2, 3, 4, 5]
-                expect {new_game.valid_difference?(array)}.to change{new_game.instance_variable_get(:@valid_line)}.from([]).to([5, 4, 3, 2])
-            end
-        end
-
-        context "when given array of row nums that contain a token and does not have 4 numbers" do 
-            subject(:new_game) {described_class.new('mickey', 'mouse', 'X', 'O')}
-
-            it 'returns false' do 
-                array = [3, 4, 5]
-                expect(new_game.valid_difference?(array)).to eq(false)
-            end
-        end
-
-        context "when given array of column nums that contain a token and have 4 numbers that all have a difference of 1" do 
-            subject(:new_game) {described_class.new('mickey', 'chango', 'X', 'O')}
-
-            it 'returns true' do 
-                array = [0, 1, 2, 3]
-                expect(new_game.valid_difference?(array)).to eq(true)
-            end
-        end
-
-        context 'when given an array with lots of column nums that contain a token and have 4 numbers that all have a difference of 1' do 
-            subject(:new_game) {described_class.new('mickey', 'channgo', 'X', 'O')}
-
-            it 'returns true' do 
-                array = [0, 2, 3, 5, 6, 0, 1, 2, 3, 5, 0, 3, 4]
-                expect(new_game.valid_difference?(array)).to eq(true)
-            end
-        end
-
-        context "when given array of columns nums that contain a token and does not have 4 numbers" do 
-            subject(:new_game) {described_class.new('mickey', 'Chango17', 'X', 'O')}
-
-            it 'returns false' do 
-                array = [1, 3, 4]
-                expect(new_game.valid_difference?(array)).to eq(false)
+                expect(new_game.win?('mickey')).to eq(true)
             end
         end
     end
@@ -372,8 +271,7 @@ describe Connect_four do
             it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                valid_line = [5, 4, 3, 2]
-                expect(new_game.vertical_line_column?(valid_line, 'X')).to eq(true)
+                expect(new_game.vertical_line_column?('X')).to eq(true)
             end
         end
 
@@ -390,8 +288,7 @@ describe Connect_four do
             it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                valid_line = [3, 2, 1, 0]
-                expect(new_game.vertical_line_column?(valid_line, 'X')).to eq(true)
+                expect(new_game.vertical_line_column?('X')).to eq(true)
             end
         end
 
@@ -408,16 +305,16 @@ describe Connect_four do
             it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                valid_line = [4, 3, 2, 1]
-                expect(new_game.vertical_line_column?(valid_line, 'X')).to eq(true)
+                expect(new_game.vertical_line_column?('X')).to eq(true)
             end
         end
 
         context 'when given an array of unvalid row numbers ' do 
             
             it 'returns false' do 
-                unvalid_array = []
-                expect(new_game.vertical_line_column?(unvalid_array, 'X')).to eq(false)
+                rows = new_game.instance_variable_get(:@rows)
+                puts rows
+                expect(new_game.vertical_line_column?('X')).to eq(false)
             end
         end
     end
@@ -438,8 +335,7 @@ describe Connect_four do
             it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                valid_line = [3, 2, 1, 0]
-                expect(new_game.horizontal_line_row?(valid_line, 'X')).to eq(true)
+                expect(new_game.horizontal_line_row?('X')).to eq(true)
             end
         end
 
@@ -459,16 +355,16 @@ describe Connect_four do
             it 'returns true' do 
                 rows = new_game.instance_variable_get(:@rows)
                 puts rows
-                valid_line = [6, 5, 4, 3]
-                expect(new_game.horizontal_line_row?(valid_line, 'X')).to eq(true)
+                expect(new_game.horizontal_line_row?('X')).to eq(true)
             end
         end
 
         context 'when given an array of unvalid nums' do 
 
             it 'returns false' do 
-                unvalid_array = []
-                expect(new_game.horizontal_line_row?(unvalid_array, 'X')).to eq(false)
+                rows = new_game.instance_variable_get(:@rows)
+                puts rows
+                expect(new_game.horizontal_line_row?('X')).to eq(false)
             end
         end 
     end
